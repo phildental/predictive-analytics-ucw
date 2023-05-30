@@ -1,0 +1,6 @@
+https://www.kaggle.com/datasets/utkarshx27/global-poverty-and-inequality-dataset
+https://www.kaggle.com/datasets/radheshyamkollipara/bank-customer-churn?resource=download
+https://www.kaggle.com/datasets/fatihb/coffee-quality-data-cqi
+https://www.kaggle.com/datasets/utkarshx27/world-gdp-growth-1980-2028
+https://www.kaggle.com/datasets/utkarshx27/global-poverty-and-inequality-dataset
+https://www.kaggle.com/datasets/ppb00x/credit-risk-customers

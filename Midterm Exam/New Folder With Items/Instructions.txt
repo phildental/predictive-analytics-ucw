@@ -1,0 +1,14 @@
+The consumption function captures one of the key relationships in economics. It expresses consumption as a function of disposal income, where disposal income is income after taxes. The attached file “Midterm-Dataset-1” shows data on average US annual consumption (in $), disposable income (in $) for the years 2000 to 2016, and the job type (1: professional, 0: otherwise) in different countries. 
+
+1. Develop RF prediction model for consumption.
+
+2. Rationalize the chosen structure of the model. 
+
+3. What is the predicted consumption if the disposal income is $33,000 (use mean/mode for other variables if used)? 
+
+4. Simulate the model variables
+
+5. Comment on the predicted values
+
+6. What are the limitations of the model?
+
