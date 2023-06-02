@@ -1,5 +1,8 @@
 import pandas as pd
 import statistics
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -7,7 +10,7 @@ from sklearn.inspection import permutation_importance
 from sklearn.preprocessing import StandardScaler
 
 # Read the data
-df = pd.read_excel('/Users/felipemarques/Documents/GitHub/ucw/predictive-analytics/Final Project/Suggested Databases/Customer-Churn-Records (1).xlsx')
+df = pd.read_excel('/Users/felipemarques/Documents/GitHub/ucw/predictive-analytics-ucw/Final Project/Suggested Databases/Customer-Churn-Records (1).xlsx')
 
 # Split the data into X and y
 y = df['Exited']
@@ -36,8 +39,24 @@ r2 = r2_score(y_test, y_pred)
 ape = abs(y_pred-y_test)/y_test *100
 mape = statistics.mean(ape)
 
-# Export df columns to excel
-#x_encoded.to_excel('/Users/felipemarques/Documents/GitHub/ucw/predictive-analytics/Final Project/Suggested Databases/Customer-Churn-Records (Col).xlsx', index = False)
+# Predict on training data
+y_train_pred = forest_model.predict(x_train)
+
+# Calculate metrics for training data
+mae_train = mean_absolute_error(y_train, y_train_pred)
+mse_train = mean_squared_error(y_train, y_train_pred)
+r2_train = r2_score(y_train, y_train_pred)
+
+# Print metrics for training data
+print(f"Training Mean Absolute Error: {mae_train:.2f}")
+print(f"Training Mean Squared Error: {mse_train:.2f}")
+print(f"Training R-squared: {r2_train:.2f}")
+
+# Print metrics for test data
+print(f"Test Mean Absolute Error: {mae:.2f}")
+print(f"Test Mean Squared Error: {mse:.2f}")
+print(f"Test R-squared: {r2:.2f}")
+
 
 # Calculate the feature importances
 importance_scores = forest_model.feature_importances_
@@ -67,6 +86,40 @@ plt.ylabel("Predicted Values")
 plt.title("Actual vs. Predicted Values")
 plt.legend()
 plt.show()
+
+from sklearn.metrics import confusion_matrix
+
+
+# Convert predicted probabilities to binary predictions
+y_pred_binary = np.where(y_pred > 0.5, 1, 0)
+
+# Generate confusion matrix
+cm = confusion_matrix(y_test, y_pred_binary)
+
+# Plot confusion matrix
+plt.figure(figsize=(10,7))
+sns.heatmap(cm, annot=True, fmt='d')
+plt.xlabel('Predicted')
+plt.ylabel('Truth')
+plt.show()
+
+# Calculate correlation matrix
+corr = df.corr()
+
+# Generate a mask for the upper triangle
+mask = np.triu(np.ones_like(corr, dtype=bool))
+
+# Set up the matplotlib figure
+f, ax = plt.subplots(figsize=(11, 9))
+
+# Generate a custom diverging colormap
+cmap = sns.diverging_palette(230, 20, as_cmap=True)
+
+# Draw the heatmap with the mask and correct aspect ratio
+sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
+            square=True, linewidths=.5, cbar_kws={"shrink": .5})
+plt.show()
+
 
 #Print the feature importances and permutation importances to see which features are most important in the model.
 print("Feature Importances:")
