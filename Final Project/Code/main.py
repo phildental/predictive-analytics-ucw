@@ -4,12 +4,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.inspection import permutation_importance
 from sklearn.preprocessing import StandardScaler
 
-#pedro
 # Read the data
 df = pd.read_excel('/Users/felipemarques/Documents/GitHub/ucw/predictive-analytics-ucw/Final Project/Suggested Databases/Customer-Churn-Records (1).xlsx')
 
@@ -27,8 +26,14 @@ feature_names = x_encoded.columns
 x_train, x_test, y_train, y_test = train_test_split(x_encoded, y, test_size=0.2, random_state=42)
 
 # Create the model and fit it to the training data
-forest_model = RandomForestRegressor(random_state=42, max_depth=10, max_features=8, n_estimators=500)
+forest_model = RandomForestClassifier(random_state=42, max_depth=10, max_features=8, n_estimators=500)
 forest_model.fit(x_train, y_train)
+
+# Predict the probabilities of the test data
+y_pred_proba = forest_model.predict_proba(x_test)
+
+# The second column corresponds to the probability that the customer exits
+exit_probabilities = y_pred_proba[:, 1]
 
 # Predict the test data
 y_pred = forest_model.predict(x_test)
@@ -121,6 +126,7 @@ sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
             square=True, linewidths=.5, cbar_kws={"shrink": .5})
 plt.show()
 
+langchain.conversation(verbose=)
 
 #Print the feature importances and permutation importances to see which features are most important in the model.
 print("Feature Importances:")
@@ -139,38 +145,33 @@ graph.render('random_forest', format='pdf', view=False, cleanup=True)
 
 # Predict the churn for a customer with the following characteristics:
 new_data = {
-    'CreditScore': [553],
-    'Age': [41],
-    'Tenure': [9],
-    'Balance': [110112.54],
-    'NumOfProducts': [2],
-    'IsActiveMember': [0],
-    'EstimatedSalary': [81898.81],
-    'Complain': [0],
+    'CreditScore': [710],
+    'Age': [43],
+    'Tenure': [2],
+    'Balance': [140080.32],
+    'NumOfProducts': [3],
+    'IsActiveMember': [1],
+    'EstimatedSalary': [157908.19],
+    'Complain': [1],
     'Satisfaction Score': [3],
-    'Point Earned': [611],
-    'Gender_Female': [0],
-    'Gender_Male': [1],
-    'Geography_France': [0],
-    'Geography_Germany': [1],
-    'Geography_Spain': [0],
-    'Card Type_DIAMOND': [1],
-    'Card Type_GOLD': [0],
-    'Card Type_PLATINUM': [0],
-    'Card Type_SILVER': [0]
+    'Point Earned': [350],
+    'Gender_Female': [0], # Assuming FALSE translates to 0
+    'Gender_Male': [1], # Assuming TRUE translates to 1
+    'Geography_France': [0], # Assuming FALSE translates to 0
+    'Geography_Germany': [1], # Assuming TRUE translates to 1
+    'Geography_Spain': [0], # Assuming FALSE translates to 0
+    'Card Type_DIAMOND': [1], # Assuming TRUE translates to 1
+    'Card Type_GOLD': [0], # Assuming FALSE translates to 0
+    'Card Type_PLATINUM': [0], # Assuming FALSE translates to 0
+    'Card Type_SILVER': [0] # Assuming FALSE translates to 0
 }
 
 # Create a pandas DataFrame from the dictionary
 input_data = pd.DataFrame.from_dict(new_data)
 
-# Initialize and fit the StandardScaler object
-STD = StandardScaler()
-STD.fit(x_train)
-
-# Standardize the input data using the same StandardScaler used during training
-input_data_std = STD.transform(input_data)
-
 # Predict the churn using the Random Forest model
-rf_predicted_output = forest_model.predict(input_data_std)
+rf_predicted_probabilities = forest_model.predict_proba(input_data)
 
-print(f"Random Forest predicted Exited: {int(rf_predicted_output)}")
+# Print probabilities for no-exit and exit
+print(f"Data point: No-exit probability = {rf_predicted_probabilities[0][0]*100:.2f}%, Exit probability = {rf_predicted_probabilities[0][1]*100:.2f}%")
+
