@@ -126,7 +126,6 @@ sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
             square=True, linewidths=.5, cbar_kws={"shrink": .5})
 plt.show()
 
-langchain.conversation(verbose=)
 
 #Print the feature importances and permutation importances to see which features are most important in the model.
 print("Feature Importances:")
@@ -138,11 +137,6 @@ print(permutation_importances)
 from sklearn.tree import export_graphviz
 import graphviz
 
-dot_data = export_graphviz(forest_model.estimators_[0], out_file=None, feature_names=feature_names, filled=True)
-graph = graphviz.Source(dot_data)
-graph.format = 'pdf'
-graph.render('random_forest', format='pdf', view=False, cleanup=True)
-
 # Predict the churn for a customer with the following characteristics:
 new_data = {
     'CreditScore': [710],
@@ -152,7 +146,7 @@ new_data = {
     'NumOfProducts': [3],
     'IsActiveMember': [1],
     'EstimatedSalary': [157908.19],
-    'Complain': [1],
+    'Complain': [0],
     'Satisfaction Score': [3],
     'Point Earned': [350],
     'Gender_Female': [0], # Assuming FALSE translates to 0
@@ -175,3 +169,57 @@ rf_predicted_probabilities = forest_model.predict_proba(input_data)
 # Print probabilities for no-exit and exit
 print(f"Data point: No-exit probability = {rf_predicted_probabilities[0][0]*100:.2f}%, Exit probability = {rf_predicted_probabilities[0][1]*100:.2f}%")
 
+# Age range for which we want to make predictions
+age_range = list(range(18, 91))
+
+# Initialize a dictionary to hold the predicted probabilities
+predicted_probs = {}
+
+# Loop through the age range and predict for each age
+for age in age_range:
+    # Change the age in the new_data dictionary
+    new_data['Age'] = [age]
+    # Convert the dictionary to a pandas DataFrame
+    input_data = pd.DataFrame.from_dict(new_data)
+    # Predict the churn using the Random Forest model
+    rf_predicted_probabilities = forest_model.predict_proba(input_data)
+    # Add the probabilities to the predicted_probs dictionary
+    predicted_probs[age] = rf_predicted_probabilities[0][1]  # adding only the exit probability
+
+# Convert the predicted probabilities to a DataFrame for easier viewing
+predicted_probs_df = pd.DataFrame(list(predicted_probs.items()), columns=['Age', 'Exit_Probability'])
+
+# Plot the predicted probabilities (Age)
+plt.scatter(predicted_probs_df['Age'], predicted_probs_df['Exit_Probability'])
+plt.xlabel('Age')
+plt.ylabel('Exit Probability')
+plt.title('Exit Probability vs. Age')
+plt.show()
+
+# Age range for which we want to make predictions
+numproducts_range = list(range(1, 5))
+
+# Initialize a dictionary to hold the predicted probabilities
+predicted_probs = {}
+
+# Loop through the age range and predict for each age
+for numproducts in age_range:
+    # Change the age in the new_data dictionary
+    new_data['NumOfProducts'] = [numproducts]
+    # Convert the dictionary to a pandas DataFrame
+    input_data = pd.DataFrame.from_dict(new_data)
+    # Predict the churn using the Random Forest model
+    rf_predicted_probabilities = forest_model.predict_proba(input_data)
+    # Add the probabilities to the predicted_probs dictionary
+    predicted_probs[numproducts] = rf_predicted_probabilities[0][1]  # adding only the exit probability
+
+# Convert the predicted probabilities to a DataFrame for easier viewing
+predicted_probs_df = pd.DataFrame(list(predicted_probs.items()), columns=['NumOfProducts', 'Exit_Probability'])
+
+
+# Plot the predicted probabilities (Age)
+plt.scatter(predicted_probs_df['NumOfProducts'], predicted_probs_df['Exit_Probability'])
+plt.xlabel('NumOfProducts')
+plt.ylabel('Exit Probability')
+plt.title('Exit Probability vs. Nº of Products')
+plt.show()
